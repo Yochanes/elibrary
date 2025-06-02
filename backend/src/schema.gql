@@ -1,0 +1,48 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: Int!
+  email: String!
+  password: String!
+  resetToken: String
+  resetTokenExpiry: DateTime
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type Book {
+  id: Int!
+  title: String!
+  author: String!
+  genre: String!
+  year: Int!
+  pdfPath: String
+}
+
+type BooksResponse {
+  books: [Book!]!
+  total: Int!
+}
+
+type Query {
+  user(email: String!): User
+  books(search: String, genre: String, skip: Int = 0, take: Int = 6): BooksResponse!
+}
+
+type Mutation {
+  register(email: String!, password: String!): String!
+  login(email: String!, password: String!): String!
+  requestPasswordReset(email: String!): String!
+  resetPassword(token: String!, newPassword: String!): String!
+  addBook(title: String!, author: String!, genre: String!, year: Int!, file: Upload): Book!
+  updateBook(id: Int!, title: String!, author: String!, genre: String!, year: Int!): Book!
+  deleteBook(id: Int!): Boolean!
+}
+
+"""The `Upload` scalar type represents a file upload."""
+scalar Upload
