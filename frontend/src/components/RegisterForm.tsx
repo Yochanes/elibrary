@@ -31,6 +31,7 @@ export const RegisterForm: React.FC = () => {
     try {
       const { data: result } = await registerMutation({ variables: data });
       setToken(result.register);
+      localStorage.setItem('userEmail', data.email);
       navigate('/home');
     } catch (err: any) {
       setError(err.message.includes('Email уже занят') ? 'Email уже занят' : 'Ошибка регистрации');

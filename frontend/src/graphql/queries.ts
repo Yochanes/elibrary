@@ -28,11 +28,12 @@ export const BOOKS_QUERY = gql`
 `;
 
 export const GET_USER_PROFILE = gql`
-  query GetUserProfile {
-    me {
+  query GetUserProfile($email: String!) {
+    me(email: $email) {
       id
       email
       createdAt
+      avatar
     }
   }
 `;

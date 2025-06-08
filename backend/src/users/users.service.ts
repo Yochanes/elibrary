@@ -38,4 +38,13 @@ export class UsersService {
     await this.usersRepository.update(id, data);
     return this.usersRepository.findOne({ where: { id } });
   }
+
+  async updateAvatar(email: string, avatarPath: string): Promise<User> {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new Error('Пользователь не найден');
+    }
+    user.avatar = avatarPath;
+    return this.usersRepository.save(user);
+  }
 }

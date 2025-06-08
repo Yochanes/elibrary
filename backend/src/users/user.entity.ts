@@ -28,4 +28,8 @@ export class User {
   @Field()
   @CreateDateColumn()
   createdAt: Date;
+
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  avatar: string; // Путь к аватару пользователя
 }

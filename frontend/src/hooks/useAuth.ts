@@ -2,9 +2,14 @@ import { useCallback, useEffect, useState } from 'react';
 import { useApolloClient, gql } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 
+interface User {
+  id: number;
+  email: string;
+}
+
 const ME_QUERY = gql`
-  query Me {
-    me {
+  query Me($email: String!) {
+    me(email: $email) {
       id
       email
     }
@@ -15,7 +20,7 @@ const ME_QUERY = gql`
 // @returns методы для работы с JWT-токеном
 
 export const useAuth = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const client = useApolloClient();
   const navigate = useNavigate();
@@ -34,9 +39,16 @@ export const useAuth = () => {
   useEffect(() => {
     const token = getToken();
     if (token) {
+      const email = localStorage.getItem('userEmail');
+      if (!email) {
+        setLoading(false);
+        return;
+      }
+
       client
         .query({
           query: ME_QUERY,
+          variables: { email },
           context: {
             headers: {
               Authorization: `Bearer ${token}`,

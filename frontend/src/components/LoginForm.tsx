@@ -31,6 +31,7 @@ export const LoginForm: React.FC = () => {
     try {
       const { data: result } = await login({ variables: data });
       setToken(result.login);
+      localStorage.setItem('userEmail', data.email);
       navigate('/home');
     } catch (err: any) {
       setError('Неверный email или пароль');

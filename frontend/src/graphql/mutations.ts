@@ -71,3 +71,9 @@ export const UPDATE_READING_PROGRESS = gql`
     }
   }
 `;
+
+export const UPLOAD_AVATAR = gql`
+  mutation UploadAvatar($input: UploadAvatarInput!, $email: String!) {
+    uploadAvatar(input: $input, email: $email)
+  }
+`;
