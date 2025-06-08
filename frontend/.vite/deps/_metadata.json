@@ -1,0 +1,70 @@
+{
+  "hash": "a3637dd9",
+  "configHash": "a67c618a",
+  "lockfileHash": "f2cd9409",
+  "browserHash": "dd982894",
+  "optimized": {
+    "@apollo/client": {
+      "src": "../../node_modules/@apollo/client/index.js",
+      "file": "@apollo_client.js",
+      "fileHash": "ce15d62c",
+      "needsInterop": false
+    },
+    "lucide-react": {
+      "src": "../../node_modules/lucide-react/dist/esm/lucide-react.js",
+      "file": "lucide-react.js",
+      "fileHash": "04a6499d",
+      "needsInterop": false
+    },
+    "react": {
+      "src": "../../node_modules/react/index.js",
+      "file": "react.js",
+      "fileHash": "f4c1d167",
+      "needsInterop": true
+    },
+    "react-pdf": {
+      "src": "../../node_modules/react-pdf/dist/esm/index.js",
+      "file": "react-pdf.js",
+      "fileHash": "b7f1f5d4",
+      "needsInterop": false
+    },
+    "react-router-dom": {
+      "src": "../../node_modules/react-router-dom/dist/index.mjs",
+      "file": "react-router-dom.js",
+      "fileHash": "a321c495",
+      "needsInterop": false
+    },
+    "@headlessui/react": {
+      "src": "../../node_modules/@headlessui/react/dist/headlessui.esm.js",
+      "file": "@headlessui_react.js",
+      "fileHash": "a7c0ff70",
+      "needsInterop": false
+    }
+  },
+  "chunks": {
+    "https-XRUYGCQX": {
+      "file": "https-XRUYGCQX.js"
+    },
+    "url-YR7V36UO": {
+      "file": "url-YR7V36UO.js"
+    },
+    "chunk-2KHBIA62": {
+      "file": "chunk-2KHBIA62.js"
+    },
+    "chunk-ECWOLUX3": {
+      "file": "chunk-ECWOLUX3.js"
+    },
+    "chunk-Z4L4S4OG": {
+      "file": "chunk-Z4L4S4OG.js"
+    },
+    "fs-OZYARV2F": {
+      "file": "fs-OZYARV2F.js"
+    },
+    "http-JOV4RC4V": {
+      "file": "http-JOV4RC4V.js"
+    },
+    "chunk-WOOG5QLI": {
+      "file": "chunk-WOOG5QLI.js"
+    }
+  }
+}
