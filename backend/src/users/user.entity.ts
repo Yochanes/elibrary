@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 
 // Сущность пользователя для TypeORM и GraphQL
@@ -24,4 +24,8 @@ export class User {
   @Field({ nullable: true })
   @Column({ nullable: true })
   resetTokenExpiry: Date; // Срок действия токена
+  
+  @Field()
+  @CreateDateColumn()
+  createdAt: Date;
 }

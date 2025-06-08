@@ -8,6 +8,7 @@ type User {
   password: String!
   resetToken: String
   resetTokenExpiry: DateTime
+  createdAt: DateTime!
 }
 
 """
@@ -22,6 +23,7 @@ type Book {
   genre: String!
   year: Int!
   pdfPath: String
+  readingProgress: Int
 }
 
 type BooksResponse {
@@ -30,7 +32,9 @@ type BooksResponse {
 }
 
 type Query {
+  me: User!
   user(email: String!): User
+  book(id: Int!): Book!
   books(search: String, genre: String, skip: Int = 0, take: Int = 6): BooksResponse!
 }
 
@@ -39,6 +43,7 @@ type Mutation {
   login(email: String!, password: String!): String!
   requestPasswordReset(email: String!): String!
   resetPassword(token: String!, newPassword: String!): String!
+  updateReadingProgress(id: Int!, page: Int!): Book!
   addBook(title: String!, author: String!, genre: String!, year: Int!, file: Upload): Book!
   updateBook(id: Int!, title: String!, author: String!, genre: String!, year: Int!): Book!
   deleteBook(id: Int!): Boolean!

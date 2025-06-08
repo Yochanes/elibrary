@@ -11,6 +11,10 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
   ) {}
+  
+  async findOne(id: number): Promise<User> {
+    return this.usersRepository.findOne({ where: { id } });
+  }
 
   // Создание пользователя
   async create(email: string, password: string): Promise<User> {

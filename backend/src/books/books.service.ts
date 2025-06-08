@@ -12,6 +12,20 @@ export class BooksService {
     @InjectRepository(Book)
     private booksRepository: Repository<Book>,
   ) {}
+  
+  async findOne(id: number): Promise<Book> {
+    const book = await this.booksRepository.findOne({ where: { id } });
+    if (!book) {
+      throw new BadRequestException('Книга не найдена');
+    }
+    return book;
+  }
+  
+  async updateReadingProgress(id: number, page: number): Promise<Book> {
+    const book = await this.findOne(id);
+    book.readingProgress = page;
+    return this.booksRepository.save(book);
+  }    
 
   async findAll(search?: string, genre?: string, skip = 0, take = 6): Promise<{ books: Book[]; total: number }> {
     let query = this.booksRepository.createQueryBuilder('book');

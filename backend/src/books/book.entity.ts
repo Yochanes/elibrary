@@ -27,4 +27,8 @@ export class Book {
   @Field({ nullable: true })
   @Column({ nullable: true })
   pdfPath?: string;
+  
+  @Field(() => Int, { nullable: true })
+  @Column({ nullable: true, default: 1 })
+  readingProgress?: number;
 }

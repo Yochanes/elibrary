@@ -13,6 +13,12 @@ import { GraphQLUpload, FileUpload } from 'graphql-upload';
 @Resolver(() => Book)
 export class BooksResolver {
   constructor(private booksService: BooksService) {}
+  
+  @Query(() => Book)
+  @UseGuards(JwtAuthGuard)
+  async book(@Args('id', { type: () => Int }) id: number): Promise<Book> {
+    return this.booksService.findOne(id);
+  }
 
   @Query(() => BooksResponse)
   @UseGuards(JwtAuthGuard)
@@ -23,6 +29,15 @@ export class BooksResolver {
     @Args('take', { type: () => Int, nullable: true, defaultValue: 6 }) take?: number,
   ): Promise<BooksResponse> {
     return this.booksService.findAll(search, genre, skip, take);
+  }
+  
+  @Mutation(() => Book)
+  @UseGuards(JwtAuthGuard)
+  async updateReadingProgress(
+    @Args('id', { type: () => Int }) id: number,
+    @Args('page', { type: () => Int }) page: number,
+  ): Promise<Book> {
+    return this.booksService.updateReadingProgress(id, page);
   }
 
   @Mutation(() => Book)
