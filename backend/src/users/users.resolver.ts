@@ -8,11 +8,15 @@ import { FileUpload } from 'graphql-upload';
 import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import * as path from 'path';
+import { JwtService } from '@nestjs/jwt';
 
 // GraphQL резолвер для пользователей
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+  ) {}
   
   @Query(() => User)
   @UseGuards(JwtAuthGuard)
@@ -66,5 +70,44 @@ export class UsersResolver {
     await this.usersService.updateAvatar(email, avatarPath);
 
     return avatarPath;
+  }
+
+  @Mutation(() => User)
+  @UseGuards(JwtAuthGuard)
+  async updateName(
+    @Args('email') email: string,
+    @Args('name') name: string,
+  ): Promise<User> {
+    const user = await this.usersService.findByEmail(email);
+    if (!user) {
+      throw new Error('Пользователь не найден');
+    }
+    user.name = name;
+    return this.usersService.update(user.id, { name });
+  }
+
+  @Mutation(() => String)
+  @UseGuards(JwtAuthGuard)
+  async updateEmail(
+    @Args('oldEmail') oldEmail: string,
+    @Args('newEmail') newEmail: string,
+  ): Promise<string> {
+    const user = await this.usersService.findByEmail(oldEmail);
+    if (!user) {
+      throw new Error('Пользователь не найден');
+    }
+
+    // Проверяем, не занят ли новый email
+    const existingUser = await this.usersService.findByEmail(newEmail);
+    if (existingUser) {
+      throw new Error('Этот email уже используется');
+    }
+
+    user.email = newEmail;
+    await this.usersService.update(user.id, { email: newEmail });
+
+    // Генерируем новый токен с обновленным email
+    const payload = { userId: user.id, email: newEmail };
+    return this.jwtService.sign(payload);
   }
 }

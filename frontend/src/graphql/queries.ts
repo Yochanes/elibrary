@@ -32,6 +32,7 @@ export const GET_USER_PROFILE = gql`
     me(email: $email) {
       id
       email
+      name
       createdAt
       avatar
     }

@@ -77,3 +77,21 @@ export const UPLOAD_AVATAR = gql`
     uploadAvatar(input: $input, email: $email)
   }
 `;
+
+export const UPDATE_NAME = gql`
+  mutation UpdateName($email: String!, $name: String!) {
+    updateName(email: $email, name: $name) {
+      id
+      email
+      name
+      createdAt
+      avatar
+    }
+  }
+`;
+
+export const UPDATE_EMAIL = gql`
+  mutation UpdateEmail($oldEmail: String!, $newEmail: String!) {
+    updateEmail(oldEmail: $oldEmail, newEmail: $newEmail)
+  }
+`;

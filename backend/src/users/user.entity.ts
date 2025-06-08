@@ -13,6 +13,10 @@ export class User {
   @Column({ unique: true })
   email: string;
 
+  @Field({ nullable: true })
+  @Column({ nullable: true })
+  name: string;
+
   @Field()
   @Column()
   password: string; // Хранится в хешированном виде

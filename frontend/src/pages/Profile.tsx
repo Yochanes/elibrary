@@ -2,15 +2,20 @@ import { useQuery, useMutation } from '@apollo/client';
 import { useAuth } from '../hooks/useAuth';
 import Header from '../components/Header';
 import { GET_USER_PROFILE } from '../graphql/queries';
-import { UPLOAD_AVATAR } from '../graphql/mutations';
+import { UPLOAD_AVATAR, UPDATE_NAME, UPDATE_EMAIL } from '../graphql/mutations';
 import { useState, useRef } from 'react';
-import { ImageUp } from 'lucide-react';
+import { ImageUp, Edit2 } from 'lucide-react';
 
 const Profile = () => {
   const { getToken, user } = useAuth();
   const token = getToken();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
 
   const { data, loading, error, refetch } = useQuery(GET_USER_PROFILE, {
     variables: {
@@ -25,6 +30,22 @@ const Profile = () => {
   });
 
   const [uploadAvatar] = useMutation(UPLOAD_AVATAR, {
+    context: {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    },
+  });
+
+  const [updateName] = useMutation(UPDATE_NAME, {
+    context: {
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    },
+  });
+
+  const [updateEmail] = useMutation(UPDATE_EMAIL, {
     context: {
       headers: {
         Authorization: token ? `Bearer ${token}` : '',
@@ -53,6 +74,56 @@ const Profile = () => {
       console.error('Error uploading avatar:', error);
     } finally {
       setUploading(false);
+    }
+  };
+
+  const handleNameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await updateName({
+        variables: {
+          email: data.me.email,
+          name: newName,
+        },
+      });
+      await refetch();
+      setIsEditingName(false);
+      setNewName('');
+    } catch (error) {
+      console.error('Error updating name:', error);
+    }
+  };
+
+  const handleEmailSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setEmailError('');
+    
+    // Валидация email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(newEmail)) {
+      setEmailError('Пожалуйста, введите корректный email');
+      return;
+    }
+
+    try {
+      const { data: updateData } = await updateEmail({
+        variables: {
+          oldEmail: data.me.email,
+          newEmail: newEmail,
+        },
+      });
+
+      // Обновляем токен и email в localStorage
+      localStorage.setItem('token', updateData.updateEmail);
+      localStorage.setItem('userEmail', newEmail);
+
+      // Обновляем данные профиля
+      await refetch();
+      setIsEditingEmail(false);
+      setNewEmail('');
+    } catch (error: any) {
+      console.error('Error updating email:', error);
+      setEmailError(error.message || 'Ошибка при обновлении email');
     }
   };
 
@@ -125,9 +196,78 @@ const Profile = () => {
                   disabled={uploading}
                 />
               </div>
-              <div className="text-center sm:text-left">
-                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{profileUser?.email}</h1>
-                <p className="text-gray-600 mt-1">Пользователь</p>
+              <div className="text-center sm:text-left flex-1">
+                <div className="flex items-center justify-center sm:justify-start space-x-2">
+                  {isEditingName ? (
+                    <form onSubmit={handleNameSubmit} className="flex items-center space-x-2">
+                      <input
+                        type="text"
+                        value={newName}
+                        onChange={(e) => setNewName(e.target.value)}
+                        placeholder="Введите имя"
+                        className="text-2xl sm:text-3xl font-bold text-gray-800 border-b-2 border-blue-500 focus:outline-none focus:border-blue-600 px-2 py-1 bg-transparent"
+                        autoFocus
+                      />
+                      <button
+                        type="submit"
+                        className="text-blue-600 hover:text-blue-700 transition-colors bg-transparent"
+                      >
+                        <Edit2 className="h-5 w-5" />
+                      </button>
+                    </form>
+                  ) : (
+                    <>
+                      <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">
+                        {profileUser?.name || 'Установить имя'}
+                      </h1>
+                      <button
+                        onClick={() => {
+                          setIsEditingName(true);
+                          setNewName(profileUser?.name || '');
+                        }}
+                        className="text-gray-400 hover:text-gray-600 transition-colors bg-transparent"
+                      >
+                        <Edit2 className="h-5 w-5" />
+                      </button>
+                    </>
+                  )}
+                </div>
+                <div className="mt-1">
+                  {isEditingEmail ? (
+                    <form onSubmit={handleEmailSubmit} className="flex items-center space-x-2">
+                      <input
+                        type="email"
+                        value={newEmail}
+                        onChange={(e) => setNewEmail(e.target.value)}
+                        placeholder="Введите новый email"
+                        className="text-gray-600 border-b-2 border-blue-500 focus:outline-none focus:border-blue-600 px-2 py-1 bg-transparent"
+                        autoFocus
+                      />
+                      <button
+                        type="submit"
+                        className="text-blue-600 hover:text-blue-700 transition-colors bg-transparent"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                    </form>
+                  ) : (
+                    <div className="flex items-center space-x-2">
+                      <p className="text-gray-600">{profileUser?.email}</p>
+                      <button
+                        onClick={() => {
+                          setIsEditingEmail(true);
+                          setNewEmail(profileUser?.email || '');
+                        }}
+                        className="text-gray-400 hover:text-gray-600 transition-colors bg-transparent"
+                      >
+                        <Edit2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  )}
+                  {emailError && (
+                    <p className="text-red-500 text-sm mt-1">{emailError}</p>
+                  )}
+                </div>
               </div>
             </div>
             <div className="mt-8 border-t border-gray-200 pt-8">

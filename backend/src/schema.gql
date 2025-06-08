@@ -5,6 +5,7 @@
 type User {
   id: Int!
   email: String!
+  name: String
   password: String!
   resetToken: String
   resetTokenExpiry: DateTime
@@ -45,6 +46,8 @@ type Mutation {
   requestPasswordReset(email: String!): String!
   resetPassword(token: String!, newPassword: String!): String!
   uploadAvatar(input: UploadAvatarInput!, email: String!): String!
+  updateName(email: String!, name: String!): User!
+  updateEmail(oldEmail: String!, newEmail: String!): String!
   updateReadingProgress(id: Int!, page: Int!): Book!
   addBook(title: String!, author: String!, genre: String!, year: Int!, file: Upload): Book!
   updateBook(id: Int!, title: String!, author: String!, genre: String!, year: Int!): Book!
