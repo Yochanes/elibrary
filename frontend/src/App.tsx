@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ApolloProvider } from '@apollo/client';
+import { Toaster } from 'react-hot-toast';
 import client from './apollo-client';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -16,6 +17,7 @@ function App() {
   return (
     <ApolloProvider client={client}>
       <BrowserRouter>
+        <Toaster position="top-right" />
         <Routes>
           <Route path="/" element={<Login />} />
           <Route path="/register" element={<Register />} />

@@ -38,3 +38,20 @@ export const GET_USER_PROFILE = gql`
     }
   }
 `;
+
+export const MY_BOOKS_QUERY = gql`
+  query MyBooks {
+    books {
+      books {
+        id
+        title
+        author
+        genre
+        year
+        pdfPath
+        readingProgress
+      }
+      total
+    }
+  }
+`;

@@ -14,10 +14,11 @@ import {
 } from './ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { useMutation } from '@apollo/client';
-import { DELETE_BOOK } from '../graphql/mutations';
-import { BOOKS_QUERY } from '../graphql/queries';
+import { DELETE_BOOK, ADD_TO_MY_BOOKS } from '../graphql/mutations';
+import { BOOKS_QUERY, MY_BOOKS_QUERY } from '../graphql/queries';
 import EditBookForm from './EditBookForm';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 
 interface BookCardProps {
   book: {
@@ -26,7 +27,8 @@ interface BookCardProps {
     author: string;
     genre: string;
     year: number;
-    pdfPath?: string;  // Добавлено
+    pdfPath?: string;
+    readingProgress?: number;
   };
 }
 
@@ -36,7 +38,7 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const [deleteBook] = useMutation(DELETE_BOOK, {
     update(cache, _, { variables }) {
       try {
-        // Читаем текущий кэш для BOOKS_QUERY с текущими переменными
+        // Читаем текущий кэш для BOOKS_QUERY
         const existingData: any = cache.readQuery({
           query: BOOKS_QUERY,
           variables: {
@@ -66,6 +68,24 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
             },
           });
         }
+
+        // Также обновляем кэш для MY_BOOKS_QUERY
+        const myBooksData: any = cache.readQuery({
+          query: MY_BOOKS_QUERY,
+        });
+
+        if (myBooksData) {
+          const updatedMyBooks = myBooksData.books.books.filter((b: any) => b.id !== book.id);
+          cache.writeQuery({
+            query: MY_BOOKS_QUERY,
+            data: {
+              books: {
+                books: updatedMyBooks,
+                total: myBooksData.books.total - 1,
+              },
+            },
+          });
+        }
       } catch (e) {
         console.log('Cache update error:', e);
       }
@@ -77,9 +97,104 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
     },
   });
 
+  const [addToMyBooks] = useMutation(ADD_TO_MY_BOOKS, {
+    update(cache, { data: { updateReadingProgress } }) {
+      try {
+        // Обновляем кэш для BOOKS_QUERY
+        const existingData: any = cache.readQuery({
+          query: BOOKS_QUERY,
+          variables: {
+            search: undefined,
+            genre: undefined,
+            skip: 0,
+            take: 6,
+          },
+        });
+
+        if (existingData) {
+          const updatedBooks = existingData.books.books.map((b: any) => 
+            b.id === updateReadingProgress.id ? { ...b, readingProgress: updateReadingProgress.readingProgress } : b
+          );
+
+          cache.writeQuery({
+            query: BOOKS_QUERY,
+            variables: {
+              search: undefined,
+              genre: undefined,
+              skip: 0,
+              take: 6,
+            },
+            data: {
+              books: {
+                books: updatedBooks,
+                total: existingData.books.total,
+              },
+            },
+          });
+        }
+
+        // Обновляем кэш для MY_BOOKS_QUERY
+        const myBooksData: any = cache.readQuery({
+          query: MY_BOOKS_QUERY,
+        });
+
+        if (myBooksData) {
+          const updatedMyBooks = myBooksData.books.books.map((b: any) => 
+            b.id === updateReadingProgress.id ? { ...b, readingProgress: updateReadingProgress.readingProgress } : b
+          );
+
+          // Если книга еще не в списке "Мои книги", добавляем её
+          if (!updatedMyBooks.some((b: any) => b.id === updateReadingProgress.id)) {
+            updatedMyBooks.push({
+              ...book,
+              readingProgress: updateReadingProgress.readingProgress,
+            });
+          }
+
+          cache.writeQuery({
+            query: MY_BOOKS_QUERY,
+            data: {
+              books: {
+                books: updatedMyBooks,
+                total: updatedMyBooks.length,
+              },
+            },
+          });
+        }
+      } catch (e) {
+        console.log('Cache update error:', e);
+      }
+    },
+    onCompleted: () => {
+      // Проверяем, была ли книга уже в "Моих книгах"
+      const wasInMyBooks = book.readingProgress && book.readingProgress > 1;
+      if (wasInMyBooks) {
+        toast.success('Переход к чтению книги');
+      } else {
+        toast.success('Книга добавлена в "Мои книги"');
+      }
+      navigate(`/reader/${book.id}`);
+    },
+    onError: (error) => {
+      if (error.message.includes('Недействительный токен')) {
+        navigate('/');
+      } else {
+        toast.error('Ошибка при добавлении книги');
+      }
+    },
+  });
+
   const handleDelete = async () => {
     try {
       await deleteBook({ variables: { id: book.id } });
+    } catch (err) {
+      // Ошибка обрабатывается в onError
+    }
+  };
+
+  const handleRead = async () => {
+    try {
+      await addToMyBooks({ variables: { id: book.id } });
     } catch (err) {
       // Ошибка обрабатывается в onError
     }
@@ -98,11 +213,11 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           <div className="flex items-center gap-4 mt-2">
             <Button
               variant="outline"
-              onClick={() => navigate(`/reader/${book.id}`)}
+              onClick={handleRead}
               className="flex items-center gap-2"
             >
               <BookOpen className="w-5 h-5" />
-              Читать
+              {book.readingProgress && book.readingProgress > 1 ? 'Продолжить чтение' : 'Читать'}
             </Button>
             <a
               href={`http://localhost:3000/${book.pdfPath}`}

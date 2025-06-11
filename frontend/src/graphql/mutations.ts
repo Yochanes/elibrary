@@ -95,3 +95,12 @@ export const UPDATE_EMAIL = gql`
     updateEmail(oldEmail: $oldEmail, newEmail: $newEmail)
   }
 `;
+
+export const ADD_TO_MY_BOOKS = gql`
+  mutation AddToMyBooks($id: Int!) {
+    updateReadingProgress(id: $id, page: 2) {
+      id
+      readingProgress
+    }
+  }
+`;
