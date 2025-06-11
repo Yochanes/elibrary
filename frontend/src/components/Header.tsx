@@ -24,7 +24,7 @@ const Header = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-text-light dark:text-text-dark hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200"
+                  className="text-text-light dark:text-text-dark hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200 bg-transparent"
                 >
                   <Heart className="h-5 w-5" />
                 </Button>
@@ -34,7 +34,7 @@ const Header = () => {
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+              className="text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200 bg-transparent"
             >
               {theme === 'light' ? (
                 <Moon className="h-5 w-5" />

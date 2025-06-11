@@ -126,7 +126,7 @@ const PDFReader: React.FC = () => {
               variant="outline"
               onClick={() => changeScale(-0.1)}
               disabled={scale <= 0.5}
-              className="h-8 sm:h-10 px-2 sm:px-4"
+              className="h-8 sm:h-10 px-2 sm:px-4 bg-transparent"
             >
               <ZoomOut className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
@@ -135,7 +135,7 @@ const PDFReader: React.FC = () => {
               variant="outline"
               onClick={() => changeScale(0.1)}
               disabled={scale >= 2.0}
-              className="h-8 sm:h-10 px-2 sm:px-4"
+              className="h-8 sm:h-10 px-2 sm:px-4 bg-transparent"
             >
               <ZoomIn className="w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
@@ -169,7 +169,7 @@ const PDFReader: React.FC = () => {
             variant="outline"
             onClick={() => changePage(-1)}
             disabled={pageNumber <= 1}
-            className="flex items-center gap-2 w-full sm:w-auto justify-center h-8 sm:h-10"
+            className="flex items-center gap-2 w-full sm:w-auto justify-center h-8 sm:h-10 bg-transparent"
           >
             <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
             <span className="text-sm sm:text-base">Предыдущая</span>
@@ -181,7 +181,7 @@ const PDFReader: React.FC = () => {
             variant="outline"
             onClick={() => changePage(1)}
             disabled={pageNumber >= (numPages || 1)}
-            className="flex items-center gap-2 w-full sm:w-auto justify-center h-8 sm:h-10"
+            className="flex items-center gap-2 w-full sm:w-auto justify-center h-8 sm:h-10 bg-transparent"
           >
             <span className="text-sm sm:text-base">Следующая</span>
             <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5" />

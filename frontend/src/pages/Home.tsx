@@ -178,7 +178,7 @@ const Home: React.FC = () => {
           <Button
             variant="outline"
             onClick={resetFilters}
-            className="w-full sm:w-auto border-gray-300 hover:bg-gray-100"
+            className="w-full sm:w-auto border-gray-300 hover:bg-gray-100 bg-transparent"
           >
             Сбросить фильтры
           </Button>

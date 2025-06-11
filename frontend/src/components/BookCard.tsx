@@ -292,7 +292,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onFavoriteToggle }) => {
             <Button
               variant="outline"
               onClick={handleRead}
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-transparent"
             >
               <BookOpen className="w-5 h-5" />
               {book.readingProgress && book.readingProgress > 1 ? 'Продолжить чтение' : 'Читать'}
@@ -327,13 +327,13 @@ const BookCard: React.FC<BookCardProps> = ({ book, onFavoriteToggle }) => {
             variant="ghost"
             size="icon"
             onClick={handleToggleFavorite}
-            className={`${book.isFavorite ? 'text-red-500 hover:text-red-700' : 'text-gray-500 hover:text-gray-700'}`}
+            className={`${book.isFavorite ? 'text-red-500 hover:text-red-700' : 'text-gray-500 hover:text-gray-700 bg-transparent'}`}
           >
             <Heart className={`w-5 h-5 ${book.isFavorite ? 'fill-current' : ''}`} />
           </Button>
           <Dialog>
             <DialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-blue-500 hover:text-blue-700">
+              <Button variant="ghost" size="icon" className="text-blue-500 hover:text-blue-700 bg-transparent">
                 <Edit className="w-5 h-5" />
               </Button>
             </DialogTrigger>
@@ -346,7 +346,7 @@ const BookCard: React.FC<BookCardProps> = ({ book, onFavoriteToggle }) => {
           </Dialog>
           <AlertDialog>
             <AlertDialogTrigger asChild>
-              <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700">
+              <Button variant="ghost" size="icon" className="text-red-500 hover:text-red-700 bg-transparent">
                 <Trash className="w-5 h-5" />
               </Button>
             </AlertDialogTrigger>
