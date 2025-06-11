@@ -1,5 +1,6 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, Context } from '@nestjs/graphql';
 import { BooksService } from './books.service';
+import { FavoriteBooksService } from './favorite-books.service';
 import { Book } from './book.entity';
 import { BooksResponse } from './books.response';
 import { UseGuards } from '@nestjs/common';
@@ -12,7 +13,10 @@ import { GraphQLUpload, FileUpload } from 'graphql-upload';
 
 @Resolver(() => Book)
 export class BooksResolver {
-  constructor(private booksService: BooksService) {}
+  constructor(
+    private booksService: BooksService,
+    private favoriteBooksService: FavoriteBooksService,
+  ) {}
   
   @Query(() => Book)
   @UseGuards(JwtAuthGuard)
@@ -90,5 +94,32 @@ export class BooksResolver {
   async deleteBook(@Args('id', { type: () => Int }) id: number): Promise<boolean> {
     await this.booksService.delete(id);
     return true;
+  }
+
+  @Mutation(() => Book)
+  @UseGuards(JwtAuthGuard)
+  async toggleFavorite(
+    @Args('bookId', { type: () => Int }) bookId: number,
+    @Context() context: any,
+  ): Promise<Book> {
+    const userId = context.req.user.userId;
+    return this.favoriteBooksService.toggleFavorite(userId, bookId);
+  }
+
+  @Query(() => [Book])
+  @UseGuards(JwtAuthGuard)
+  async favoriteBooks(@Context() context: any): Promise<Book[]> {
+    const userId = context.req.user.userId;
+    return this.favoriteBooksService.getFavoriteBooks(userId);
+  }
+
+  @Query(() => Boolean)
+  @UseGuards(JwtAuthGuard)
+  async isBookFavorite(
+    @Args('bookId', { type: () => Int }) bookId: number,
+    @Context() context: any,
+  ): Promise<boolean> {
+    const userId = context.req.user.userId;
+    return this.favoriteBooksService.isBookFavorite(userId, bookId);
   }
 }

@@ -2,6 +2,30 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Book {
+  id: Int!
+  title: String!
+  author: String!
+  genre: String!
+  year: Int!
+  pdfPath: String
+  readingProgress: Int
+  favoritedBy: [FavoriteBook!]
+  isFavorite: Boolean
+}
+
+type FavoriteBook {
+  id: Int!
+  user: User!
+  book: Book!
+  createdAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type User {
   id: Int!
   email: String!
@@ -11,21 +35,7 @@ type User {
   resetTokenExpiry: DateTime
   createdAt: DateTime!
   avatar: String
-}
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
-
-type Book {
-  id: Int!
-  title: String!
-  author: String!
-  genre: String!
-  year: Int!
-  pdfPath: String
-  readingProgress: Int
+  favoriteBooks: [FavoriteBook!]
 }
 
 type BooksResponse {
@@ -38,6 +48,8 @@ type Query {
   user(email: String!): User
   book(id: Int!): Book!
   books(search: String, genre: String, skip: Int = 0, take: Int = 6): BooksResponse!
+  favoriteBooks: [Book!]!
+  isBookFavorite(bookId: Int!): Boolean!
 }
 
 type Mutation {
@@ -52,6 +64,7 @@ type Mutation {
   addBook(title: String!, author: String!, genre: String!, year: Int!, file: Upload): Book!
   updateBook(id: Int!, title: String!, author: String!, genre: String!, year: Int!): Book!
   deleteBook(id: Int!): Boolean!
+  toggleFavorite(bookId: Int!): Book!
 }
 
 input UploadAvatarInput {

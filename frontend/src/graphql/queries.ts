@@ -55,3 +55,18 @@ export const MY_BOOKS_QUERY = gql`
     }
   }
 `;
+
+export const FAVORITE_BOOKS_QUERY = gql`
+  query GetFavoriteBooks {
+    favoriteBooks {
+      id
+      title
+      author
+      genre
+      year
+      pdfPath
+      readingProgress
+      isFavorite
+    }
+  }
+`;

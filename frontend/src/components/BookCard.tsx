@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Edit, Trash, BookOpen } from 'lucide-react';
+import { Edit, Trash, BookOpen, Heart } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   AlertDialog,
@@ -13,12 +13,22 @@ import {
   AlertDialogTrigger,
 } from './ui/alert-dialog';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
-import { useMutation } from '@apollo/client';
-import { DELETE_BOOK, ADD_TO_MY_BOOKS } from '../graphql/mutations';
-import { BOOKS_QUERY, MY_BOOKS_QUERY } from '../graphql/queries';
+import { useMutation, useQuery } from '@apollo/client';
+import { gql } from '@apollo/client';
+import { DELETE_BOOK, ADD_TO_MY_BOOKS, TOGGLE_FAVORITE } from '../graphql/mutations';
+import { BOOKS_QUERY, MY_BOOKS_QUERY, FAVORITE_BOOKS_QUERY } from '../graphql/queries';
 import EditBookForm from './EditBookForm';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
+
+const TOGGLE_FAVORITE_MUTATION = gql`
+  mutation ToggleFavorite($bookId: Int!) {
+    toggleFavorite(bookId: $bookId) {
+      id
+      isFavorite
+    }
+  }
+`;
 
 interface BookCardProps {
   book: {
@@ -29,11 +39,13 @@ interface BookCardProps {
     year: number;
     pdfPath?: string;
     readingProgress?: number;
+    isFavorite?: boolean;
   };
+  onFavoriteToggle?: () => void;
 }
 
 // Компонент карточки книги
-const BookCard: React.FC<BookCardProps> = ({ book }) => {
+const BookCard: React.FC<BookCardProps> = ({ book, onFavoriteToggle }) => {
   const navigate = useNavigate();
   const [deleteBook] = useMutation(DELETE_BOOK, {
     update(cache, _, { variables }) {
@@ -184,6 +196,64 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
     },
   });
 
+  const [toggleFavorite] = useMutation(TOGGLE_FAVORITE_MUTATION, {
+    update(cache, { data: { toggleFavorite } }) {
+      try {
+        // Обновляем кэш для всех запросов книг
+        const queries = [BOOKS_QUERY, MY_BOOKS_QUERY, FAVORITE_BOOKS_QUERY];
+        
+        queries.forEach(query => {
+          const existingData: any = cache.readQuery({
+            query,
+            variables: query === BOOKS_QUERY ? {
+              search: undefined,
+              genre: undefined,
+              skip: 0,
+              take: 6,
+            } : undefined,
+          });
+
+          if (existingData) {
+            const updatedBooks = existingData.books?.books?.map((b: any) => 
+              b.id === toggleFavorite.id ? { ...b, isFavorite: toggleFavorite.isFavorite } : b
+            ) || [];
+
+            cache.writeQuery({
+              query,
+              variables: query === BOOKS_QUERY ? {
+                search: undefined,
+                genre: undefined,
+                skip: 0,
+                take: 6,
+              } : undefined,
+              data: {
+                books: {
+                  books: updatedBooks,
+                  total: existingData.books?.total || updatedBooks.length,
+                },
+              },
+            });
+          }
+        });
+      } catch (e) {
+        console.log('Cache update error:', e);
+      }
+    },
+    onCompleted: () => {
+      if (onFavoriteToggle) {
+        onFavoriteToggle();
+      }
+      toast.success(book.isFavorite ? 'Книга удалена из избранного' : 'Книга добавлена в избранное');
+    },
+    onError: (error) => {
+      if (error.message.includes('Недействительный токен')) {
+        navigate('/');
+      } else {
+        toast.error('Ошибка при обновлении избранного');
+      }
+    },
+  });
+
   const handleDelete = async () => {
     try {
       await deleteBook({ variables: { id: book.id } });
@@ -195,6 +265,14 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
   const handleRead = async () => {
     try {
       await addToMyBooks({ variables: { id: book.id } });
+    } catch (err) {
+      // Ошибка обрабатывается в onError
+    }
+  };
+
+  const handleToggleFavorite = async () => {
+    try {
+      await toggleFavorite({ variables: { bookId: book.id } });
     } catch (err) {
       // Ошибка обрабатывается в onError
     }
@@ -245,6 +323,14 @@ const BookCard: React.FC<BookCardProps> = ({ book }) => {
           </div>
         )}
         <div className="absolute top-4 right-4 flex space-x-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleToggleFavorite}
+            className={`${book.isFavorite ? 'text-red-500 hover:text-red-700' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            <Heart className={`w-5 h-5 ${book.isFavorite ? 'fill-current' : ''}`} />
+          </Button>
           <Dialog>
             <DialogTrigger asChild>
               <Button variant="ghost" size="icon" className="text-blue-500 hover:text-blue-700">

@@ -104,3 +104,12 @@ export const ADD_TO_MY_BOOKS = gql`
     }
   }
 `;
+
+export const TOGGLE_FAVORITE = gql`
+  mutation ToggleFavorite($bookId: Int!) {
+    toggleFavorite(bookId: $bookId) {
+      id
+      isFavorite
+    }
+  }
+`;

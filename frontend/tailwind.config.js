@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    darkMode: ["class"],
+    darkMode: 'class',
     content: [
     "./index.html",
     "./src/**/*.{js,ts,jsx,tsx}", // <--- это важно
@@ -13,7 +13,14 @@ module.exports = {
   			sm: 'calc(var(--radius) - 4px)'
   		},
   		colors: {
-  			background: 'hsl(var(--background))',
+  			background: {
+  				light: '#ffffff',
+  				dark: '#1a1a1a',
+  			},
+  			text: {
+  				light: '#000000',
+  				dark: '#ffffff',
+  			},
   			foreground: 'hsl(var(--foreground))',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
@@ -24,11 +31,13 @@ module.exports = {
   				foreground: 'hsl(var(--popover-foreground))'
   			},
   			primary: {
-  				DEFAULT: 'hsl(var(--primary))',
+  				light: '#3b82f6',
+  				dark: '#60a5fa',
   				foreground: 'hsl(var(--primary-foreground))'
   			},
   			secondary: {
-  				DEFAULT: 'hsl(var(--secondary))',
+  				light: '#6b7280',
+  				dark: '#9ca3af',
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
   			muted: {

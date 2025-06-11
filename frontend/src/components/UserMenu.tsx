@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApolloClient, useQuery } from '@apollo/client';
-import { UserCircle } from 'lucide-react';
+import { UserCircle, Heart } from 'lucide-react';
 import { GET_USER_PROFILE } from '../graphql/queries';
 import { useAuth } from '../hooks/useAuth';
 
@@ -47,7 +47,7 @@ const UserMenu = () => {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 focus:outline-none bg-transparent"
+        className="flex items-center space-x-2 text-text-light dark:text-text-dark hover:text-gray-900 dark:hover:text-gray-100 focus:outline-none bg-transparent transition-colors duration-200"
       >
         {data?.me?.avatar ? (
           <img
@@ -60,13 +60,13 @@ const UserMenu = () => {
         )}
       </button>
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-10">
+        <div className="absolute right-0 mt-2 w-48 bg-background-light dark:bg-background-dark rounded-md shadow-lg py-1 z-10 border border-gray-200 dark:border-gray-700 transition-colors duration-200">
           <button
             onClick={() => {
               navigate('/profile');
               setIsOpen(false);
             }}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-transparent"
+            className="block w-full text-left px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 bg-transparent transition-colors duration-200"
             role="menuitem"
           >
             Профиль
@@ -76,14 +76,25 @@ const UserMenu = () => {
               navigate('/my-books');
               setIsOpen(false);
             }}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-transparent"
+            className="block w-full text-left px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 bg-transparent transition-colors duration-200"
             role="menuitem"
           >
             Мои книги
           </button>
           <button
+            onClick={() => {
+              navigate('/favorites');
+              setIsOpen(false);
+            }}
+            className="flex items-center w-full text-left px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 bg-transparent transition-colors duration-200"
+            role="menuitem"
+          >
+            <Heart className="w-4 h-4 mr-2" />
+            Избранное
+          </button>
+          <button
             onClick={handleLogout}
-            className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 bg-transparent"
+            className="block w-full text-left px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 bg-transparent transition-colors duration-200"
             role="menuitem"
           >
             Выйти

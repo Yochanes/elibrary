@@ -1,5 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
+import { FavoriteBook } from '../books/favorite-book.entity';
 
 // Сущность пользователя для TypeORM и GraphQL
 @ObjectType()
@@ -36,4 +37,8 @@ export class User {
   @Field({ nullable: true })
   @Column({ nullable: true })
   avatar: string; // Путь к аватару пользователя
+
+  @Field(() => [FavoriteBook], { nullable: true })
+  @OneToMany(() => FavoriteBook, favoriteBook => favoriteBook.user)
+  favoriteBooks: FavoriteBook[];
 }

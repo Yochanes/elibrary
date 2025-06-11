@@ -6,6 +6,7 @@ import { setContext } from '@apollo/client/link/context';
 import { BrowserRouter } from 'react-router-dom';
 import App from './App.tsx';
 import './index.css';
+import { ThemeProvider } from './lib/theme-context';
 
 const uploadLink = createUploadLink({
   uri: 'http://localhost:3000/graphql',
@@ -30,7 +31,9 @@ const client = new ApolloClient({
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ApolloProvider client={client}>
+      <ThemeProvider>
         <App />
+      </ThemeProvider>
     </ApolloProvider>
   </React.StrictMode>,
 );
