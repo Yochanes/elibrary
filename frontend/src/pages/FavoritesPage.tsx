@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { gql } from '@apollo/client';
 import { Book } from '../types/book';
+import Header from '../components/Header';
 import BookCard from '../components/BookCard';
 import { useAuth } from '../hooks/useAuth';
 
@@ -43,6 +44,7 @@ export default function FavoritesPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+    <Header />
       <h1 className="text-2xl font-bold mb-6">Избранные книги</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {data.favoriteBooks.map((book: Book) => (

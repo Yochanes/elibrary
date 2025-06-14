@@ -5,6 +5,8 @@ import { useNavigate } from 'react-router-dom';
 interface User {
   id: number;
   email: string;
+  name: string;
+  role: string;
 }
 
 const ME_QUERY = gql`
@@ -12,6 +14,8 @@ const ME_QUERY = gql`
     me(email: $email) {
       id
       email
+      name
+      role
     }
   }
 `;
@@ -28,6 +32,7 @@ export const useAuth = () => {
   const getToken = useCallback(() => localStorage.getItem('jwt'), []);
   const setToken = useCallback((token: string) => localStorage.setItem('jwt', token), []);
   const removeToken = useCallback(() => localStorage.removeItem('jwt'), []);
+  const getUser = useCallback(() => user, [user]);
 
   const logout = useCallback(() => {
     removeToken();
@@ -70,5 +75,5 @@ export const useAuth = () => {
     }
   }, [client, getToken, removeToken]);
 
-  return { user, loading, setToken, getToken, removeToken, logout };
+  return { user, loading, setToken, getToken, removeToken, logout, getUser };
 };

@@ -13,6 +13,8 @@ import RequestPasswordReset from './pages/RequestPasswordReset';
 import ResetPassword from './pages/ResetPassword';
 import PDFReader from './components/PDFReader';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { AdminProtectedRoute } from './components/AdminProtectedRoute';
+import AdminApp from './pages/admin/App';
 
 // Главный компонент приложения
 function App() {
@@ -31,6 +33,7 @@ function App() {
           <Route path="/forgot-password" element={<RequestPasswordReset />} />
           <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/reader/:bookId" element={<ProtectedRoute><PDFReader /></ProtectedRoute>} />
+          <Route path="/admin/*" element={<AdminProtectedRoute><AdminApp /></AdminProtectedRoute>} />
         </Routes>
       </BrowserRouter>
     </ApolloProvider>
