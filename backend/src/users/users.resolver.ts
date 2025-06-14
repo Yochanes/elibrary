@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
@@ -9,6 +9,9 @@ import { v4 as uuidv4 } from 'uuid';
 import * as fs from 'fs';
 import * as path from 'path';
 import { JwtService } from '@nestjs/jwt';
+import { RoleGuard } from './role.guard';
+import { Roles } from './roles.decorator';
+import { UserRole } from '../common/enums/user-role.enum';
 
 // GraphQL резолвер для пользователей
 @Resolver(() => User)
@@ -109,5 +112,22 @@ export class UsersResolver {
     // Генерируем новый токен с обновленным email
     const payload = { userId: user.id, email: newEmail };
     return this.jwtService.sign(payload);
+  }
+
+  @Query(() => [User])
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  async getAllUsers(): Promise<User[]> {
+    return this.usersService.findAll();
+  }
+
+  @Mutation(() => User)
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Roles(UserRole.ADMIN)
+  async updateUserRole(
+    @Args('userId', { type: () => Int }) userId: number,
+    @Args('role', { type: () => String }) role: UserRole,
+  ): Promise<User> {
+    return this.usersService.updateUserRole(userId, role);
   }
 }

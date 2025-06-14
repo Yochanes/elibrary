@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
+import { UserRole } from '../common/enums/user-role.enum';
 import * as bcrypt from 'bcrypt';
 
 // Сервис для работы с пользователями
@@ -46,5 +47,27 @@ export class UsersService {
     }
     user.avatar = avatarPath;
     return this.usersRepository.save(user);
+  }
+
+  // Обновление роли пользователя (только для админов)
+  async updateUserRole(userId: number, newRole: UserRole): Promise<User> {
+    const user = await this.findOne(userId);
+    if (!user) {
+      throw new Error('Пользователь не найден');
+    }
+    
+    user.role = newRole;
+    return this.usersRepository.save(user);
+  }
+
+  // Проверка, является ли пользователь админом
+  async isAdmin(userId: number): Promise<boolean> {
+    const user = await this.findOne(userId);
+    return user?.role === UserRole.ADMIN;
+  }
+
+  // Получение всех пользователей (только для админов)
+  async findAll(): Promise<User[]> {
+    return this.usersRepository.find();
   }
 }

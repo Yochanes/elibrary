@@ -1,6 +1,7 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, OneToMany } from 'typeorm';
 import { ObjectType, Field, Int } from '@nestjs/graphql';
 import { FavoriteBook } from '../books/favorite-book.entity';
+import { UserRole } from '../common/enums/user-role.enum';
 
 // Сущность пользователя для TypeORM и GraphQL
 @ObjectType()
@@ -41,4 +42,12 @@ export class User {
   @Field(() => [FavoriteBook], { nullable: true })
   @OneToMany(() => FavoriteBook, favoriteBook => favoriteBook.user)
   favoriteBooks: FavoriteBook[];
+
+  @Field(() => String)
+  @Column({
+    type: 'enum',
+    enum: UserRole,
+    default: UserRole.USER
+  })
+  role: UserRole;
 }
