@@ -93,6 +93,16 @@ const UserMenu = () => {
             Избранное
           </button>
           <button
+            onClick={() => {
+              navigate('/payments');
+              setIsOpen(false);
+            }}
+            className="block w-full text-left px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 bg-transparent transition-colors duration-200"
+            role="menuitem"
+          >
+            Подписка
+          </button>
+          <button
             onClick={handleLogout}
             className="block w-full text-left px-4 py-2 text-sm text-text-light dark:text-text-dark hover:bg-gray-100 dark:hover:bg-gray-800 bg-transparent transition-colors duration-200"
             role="menuitem"

@@ -28,20 +28,35 @@ export class BooksService {
   }    
 
   async findAll(search?: string, genre?: string, skip = 0, take = 6): Promise<{ books: Book[]; total: number }> {
-    let query = this.booksRepository.createQueryBuilder('book');
+    const queryBuilder = this.booksRepository.createQueryBuilder('book')
+      .leftJoinAndSelect('book.favoritedBy', 'favoriteBook');
 
     if (search) {
-      query = query.where('LOWER(book.title) LIKE LOWER(:search) OR LOWER(book.author) LIKE LOWER(:search)', { 
-        search: `%${search}%` 
-      });
+      // Используем параметризованный запрос с ILIKE для регистронезависимого поиска
+      queryBuilder.andWhere(
+        '(book.title ILIKE :searchPattern OR book.author ILIKE :searchPattern)',
+        { searchPattern: `%${search.trim()}%` }
+      );
     }
 
     if (genre) {
-      query = query.andWhere('LOWER(book.genre) = LOWER(:genre)', { genre });
+      // Используем параметризованный запрос для жанра
+      queryBuilder.andWhere('book.genre ILIKE :genre', { 
+        genre: genre.trim() 
+      });
     }
 
-    const total = await query.getCount();
-    const books = await query.skip(skip).take(take).getMany();
+    // Добавляем сортировку по умолчанию
+    queryBuilder.orderBy('book.title', 'ASC');
+
+    // Получаем общее количество записей до применения пагинации
+    const total = await queryBuilder.getCount();
+
+    // Применяем пагинацию
+    const books = await queryBuilder
+      .skip(skip)
+      .take(take)
+      .getMany();
 
     return { books, total };
   }

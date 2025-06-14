@@ -10,6 +10,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 // @ts-ignore
 import { GraphQLUpload, FileUpload } from 'graphql-upload';
+import { createWriteStream } from 'fs';
 
 @Resolver(() => Book)
 export class BooksResolver {
@@ -54,26 +55,57 @@ export class BooksResolver {
     @Args('file', { type: () => GraphQLUpload, nullable: true }) file?: FileUpload,
   ): Promise<Book> {
     let uploadedFile: string | undefined;
+    
     if (file) {
       const { createReadStream, filename, mimetype } = file;
+      
+      // Проверка расширения файла
+      const fileExtension = path.extname(filename).toLowerCase();
+      if (fileExtension !== '.pdf') {
+        throw new Error('Файл должен иметь расширение .pdf');
+      }
+      
+      // Проверка MIME-типа
       if (mimetype !== 'application/pdf') {
-        throw new Error('Только PDF-файлы разрешены');
+        throw new Error('Файл должен быть в формате PDF');
       }
-      const stream = createReadStream();
-      const chunks: Buffer[] = [];
-      for await (const chunk of stream) {
-        chunks.push(Buffer.from(chunk));
-      }
-      const buffer = Buffer.concat(chunks);
+
       const uploadDir = path.join(process.cwd(), 'uploads');
-      const uniqueName = uuidv4() + path.extname(filename);
+      const uniqueName = uuidv4() + '.pdf';
       const fullPath = path.join(uploadDir, uniqueName);
       
+      // Создаем директорию, если она не существует
       fs.mkdirSync(uploadDir, { recursive: true });
-      fs.writeFileSync(fullPath, buffer);
       
-      uploadedFile = uniqueName;
+      // Создаем поток для записи файла
+      const writeStream = createWriteStream(fullPath);
+      
+      try {
+        // Получаем поток чтения из загруженного файла
+        const readStream = createReadStream();
+        
+        // Создаем промис для обработки завершения записи
+        await new Promise((resolve, reject) => {
+          readStream
+            .pipe(writeStream)
+            .on('finish', resolve)
+            .on('error', (error) => {
+              // Удаляем частично записанный файл в случае ошибки
+              fs.unlink(fullPath, () => {});
+              reject(error);
+            });
+        });
+        
+        uploadedFile = uniqueName;
+      } catch (error) {
+        // Удаляем файл в случае ошибки и пробрасываем ошибку дальше
+        if (fs.existsSync(fullPath)) {
+          fs.unlinkSync(fullPath);
+        }
+        throw new Error(`Ошибка при загрузке файла: ${error.message}`);
+      }
     }
+    
     return this.booksService.create(title, author, genre, year, uploadedFile);
   }
 

@@ -73,6 +73,7 @@ const Home: React.FC = () => {
     { value: 'Антиутопия', label: 'Антиутопия' },
     { value: 'Фэнтези', label: 'Фэнтези' },
     { value: 'Детектив', label: 'Детектив' },
+    { value: 'Бизнес', label: 'Бизнес' },
   ];
 
   const totalItems = data?.books?.total || 0;
