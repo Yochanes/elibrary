@@ -15,27 +15,30 @@ import PDFReader from './components/PDFReader';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { AdminProtectedRoute } from './components/AdminProtectedRoute';
 import AdminApp from './pages/admin/App';
+import { SearchProvider } from './contexts/SearchContext';
 
 // Главный компонент приложения
 function App() {
   return (
     <ApolloProvider client={client}>
-      <BrowserRouter>
-        <Toaster position="top-right" />
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          <Route path="/my-books" element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
-          <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
-          <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
-          <Route path="/forgot-password" element={<RequestPasswordReset />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
-          <Route path="/reader/:bookId" element={<ProtectedRoute><PDFReader /></ProtectedRoute>} />
-          <Route path="/admin/*" element={<AdminProtectedRoute><AdminApp /></AdminProtectedRoute>} />
-        </Routes>
-      </BrowserRouter>
+      <SearchProvider>
+        <BrowserRouter>
+          <Toaster position="top-right" />
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/my-books" element={<ProtectedRoute><MyBooks /></ProtectedRoute>} />
+            <Route path="/favorites" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
+            <Route path="/payments" element={<ProtectedRoute><Payments /></ProtectedRoute>} />
+            <Route path="/forgot-password" element={<RequestPasswordReset />} />
+            <Route path="/reset-password/:token" element={<ResetPassword />} />
+            <Route path="/reader/:bookId" element={<ProtectedRoute><PDFReader /></ProtectedRoute>} />
+            <Route path="/admin/*" element={<AdminProtectedRoute><AdminApp /></AdminProtectedRoute>} />
+          </Routes>
+        </BrowserRouter>
+      </SearchProvider>
     </ApolloProvider>
   );
 }

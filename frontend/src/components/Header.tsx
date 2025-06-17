@@ -4,6 +4,7 @@ import UserMenu from './UserMenu';
 import { useTheme } from '../lib/theme-context';
 import { Button } from './ui/button';
 import { useAuth } from '../hooks/useAuth';
+import HeaderSearchBar from './HeaderSearchBar';
 
 const Header = () => {
   const { theme, toggleTheme } = useTheme();
@@ -18,6 +19,12 @@ const Header = () => {
               Библиотека
             </Link>
           </div>
+          
+          {/* Поиск в центре */}
+          <div className="hidden lg:flex flex-1 max-w-2xl mx-8">
+            <HeaderSearchBar />
+          </div>
+          
           <div className="flex items-center gap-4">
             {user && (
               <Link to="/favorites">
@@ -44,6 +51,11 @@ const Header = () => {
             </Button>
             <UserMenu />
           </div>
+        </div>
+        
+        {/* Мобильная версия поиска */}
+        <div className="lg:hidden pb-4">
+          <HeaderSearchBar />
         </div>
       </div>
     </header>
